@@ -468,13 +468,20 @@ async function loadData(){
   setSyncBadge('loading');
   const tout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
   try{
-    const [c,ci,rs,rh]=await tout(Promise.all([
-      apiGet('superChecked'),apiGet('superCustomItems'),apiGet('reg_she'),apiGet('reg_he')
+    const [c,ci,rs,rh,cm]=await tout(Promise.all([
+      apiGet('superChecked'),apiGet('superCustomItems'),apiGet('reg_she'),apiGet('reg_he'),apiGet('customMenu')
     ]),5000);
     checked=JSON.parse(c||'{}');
     customItems=JSON.parse(ci||'{}');
     registros.she=JSON.parse(rs||'[]');
     registros.he=JSON.parse(rh||'[]');
+    if(cm){
+      try{
+        const saved=JSON.parse(cm);
+        Object.keys(saved).forEach(d=>{MENU_BASE[d]=saved[d];});
+        menuIsCustom=true;
+      }catch(_){}
+    }
     setSyncBadge('ok');
   }catch(e){
     console.warn('loadData:',e.message);
@@ -525,7 +532,9 @@ function renderIABanner(){
 }
 function restoreOriginalMenu(){
   Object.keys(MENU_ORIGINAL).forEach(d=>{MENU_BASE[d]=JSON.parse(JSON.stringify(MENU_ORIGINAL[d]));});
-  menuIsCustom=false;currentDay='Lunes';renderAll();
+  menuIsCustom=false;currentDay='Lunes';
+  apiSet('customMenu','').catch(()=>{});
+  renderAll();
 }
 function renderAll(){
   renderProfileCard(); renderShakeBanner(); renderIABanner(); renderDays(); renderMeals();
@@ -808,6 +817,8 @@ JSON requerido (5 días x 5 tiempos, todos los campos obligatorios):
       MENU_BASE[d]=newMenu[d];
     }
     menuIsCustom=true;currentDay='Lunes';
+    const toSave={};['Lunes','Martes','Miércoles','Jueves','Viernes'].forEach(d=>{toSave[d]=MENU_BASE[d];});
+    apiSet('customMenu',JSON.stringify(toSave)).catch(()=>{});
     document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
     document.querySelectorAll('#mainNav .nav-btn').forEach(el=>el.classList.remove('active-she','active-he'));
     document.getElementById('view-menu').classList.add('active');
