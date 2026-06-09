@@ -793,7 +793,7 @@ Inventario — Tienen: ${have.join(', ')||'ninguno'} | Falta: ${missing.join(', 
 JSON requerido (5 días x 5 tiempos, todos los campos obligatorios):
 {"Lunes":[{"time":"Desayuno","name":"Nombre","she":"ingredientes ella con gramos","he":"ingredientes él con gramos","tags_she":["3 AOA","2 verdura","2 cereal","1 grasa"],"tags_he":["3 AOA","2 verdura","1 cereal","1 grasa"]},{"time":"Media mañana","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Comida","name":"...","she":"...","he":"...","tags_she":["3 AOA","3 cereal","2 verdura","2 grasa"],"tags_he":["4 AOA","2 cereal","2 verdura","1 grasa"]},{"time":"Merienda","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Cena","name":"...","she":"...","he":"...","tags_she":["3 AOA","2 cereal","2 verdura","1 grasa"],"tags_he":["3 AOA","1 cereal","2 verdura","1 grasa"]}],"Martes":[...],"Miércoles":[...],"Jueves":[...],"Viernes":[...]}`;
   try{
-    const text=await callClaude([{role:'user',content:prompt}],2500);
+    const text=await callClaude([{role:'user',content:prompt}],8000);
     const clean=text.replace(/```json|```/g,'').trim();
     const newMenu=JSON.parse(clean);
     const days=['Lunes','Martes','Miércoles','Jueves','Viernes'];
