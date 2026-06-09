@@ -740,7 +740,7 @@ function renderInventoryBanner(){
 async function callClaude(messages,maxTokens=1400){
   const res=await fetch('/api/claude',{
     method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages})
+    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTokens,messages})
   });
   const data=await res.json();
   if(data.error){
