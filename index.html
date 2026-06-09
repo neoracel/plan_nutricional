@@ -743,7 +743,11 @@ async function callClaude(messages,maxTokens=1400){
     body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages})
   });
   const data=await res.json();
-  if(data.error)throw new Error(data.error);
+  if(data.error){
+    const msg=typeof data.error==='string'?data.error:(data.error.message||JSON.stringify(data.error));
+    throw new Error(msg);
+  }
+  if(!data.content)throw new Error('Respuesta inesperada: '+JSON.stringify(data).slice(0,200));
   return data.content.map(b=>b.text||'').join('');
 }
 
@@ -815,7 +819,7 @@ Cena: [nombre]
     const col=tipo==='medio'?'var(--green)':'var(--teal)';
     res.innerHTML=`<div class="ai-result" style="background:${bg};border-color:${bd}"><pre style="color:${col}">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
   }catch(e){
-    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error al conectar. Intenta de nuevo.</pre></div>`;
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error: ${e.message}</pre></div>`;
   }
   btn.disabled=false;
 }
@@ -830,7 +834,7 @@ async function generateSuperSmart(){
     const text=await callClaude([{role:'user',content:prompt}]);
     res.innerHTML=`<div class="ai-result" style="background:var(--blue-bg);border-color:#BFDBFE"><pre style="color:var(--blue)">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
   }catch(e){
-    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error. Intenta de nuevo.</pre></div>`;
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error: ${e.message}</pre></div>`;
   }
   btn.disabled=false;
 }
@@ -902,7 +906,7 @@ Responde en español, sin markdown, de forma clara y práctica.`;
     ]}]);
     res.innerHTML=`<div class="ai-result" style="background:var(--purple-bg);border-color:var(--purple-bd)"><pre style="color:var(--purple)">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
   }catch(e){
-    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error al analizar. Intenta de nuevo.</pre></div>`;
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error: ${e.message}</pre></div>`;
   }
   btn.disabled=false;
 }

@@ -73,8 +73,11 @@ app.post('/api/claude', async (req, res) => {
       },
       body: JSON.stringify(req.body)
     });
-    res.json(await response.json());
+    const data = await response.json();
+    if (!response.ok) console.error('Anthropic error', response.status, JSON.stringify(data));
+    res.status(response.status).json(data);
   } catch (e) {
+    console.error('Claude proxy error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });
