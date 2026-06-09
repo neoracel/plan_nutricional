@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Plan Nutricional</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F5F0;--surface:#FFF;--border:#E8E4DC;
+  --text:#1A1814;--text2:#6B6760;--text3:#A8A49E;
+  --green:#2D6A4F;--green-bg:#EAF4EE;--green-bd:#B7DCC6;
+  --teal:#0F766E;--teal-bg:#F0FDFA;--teal-bd:#99F6E4;
+  --amber:#92400E;--amber-bg:#FEF3C7;
+  --blue:#1E40AF;--blue-bg:#EFF6FF;
+  --red:#991B1B;--red-bg:#FEF2F2;
+  --purple:#6D28D9;--purple-bg:#F5F3FF;--purple-bd:#C4B5FD;
+  --radius:14px;--radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:430px;margin:0 auto}
+
+/* HEADER */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px 10px;position:sticky;top:0;z-index:10}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.header-title{font-size:16px;font-weight:600;letter-spacing:-.3px}
+.profile-toggle{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px;gap:2px}
+.pt-btn{padding:5px 12px;border-radius:16px;border:none;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2);background:transparent;transition:all .15s;white-space:nowrap}
+.pt-btn.she.active{background:var(--green);color:#fff}
+.pt-btn.he.active{background:var(--teal);color:#fff}
+.sync-badge{font-size:10px;color:var(--text3);text-align:center;padding:4px 0 0;font-weight:500}
+.sync-badge.ok{color:var(--green)}
+.sync-badge.saving{color:var(--amber)}
+
+/* NAV */
+.nav{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:9}
+.nav-btn{flex:1;padding:11px 4px;font-size:11px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:'DM Sans',sans-serif}
+.nav-btn.active-she{color:var(--green);border-bottom-color:var(--green)}
+.nav-btn.active-he{color:var(--teal);border-bottom-color:var(--teal)}
+
+/* VIEWS */
+.view{display:none;padding:16px 16px 80px}
+.view.active{display:block}
+
+/* BANNERS */
+.banner{border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;border:1px solid}
+.banner-she{background:var(--green-bg);border-color:var(--green-bd)}
+.banner-he{background:var(--teal-bg);border-color:var(--teal-bd)}
+.banner p{font-size:12px;font-weight:500}
+.banner-she p{color:var(--green)}
+.banner-he p{color:var(--teal)}
+.banner span{font-size:11px;margin-top:2px;display:block}
+.banner-she span{color:#3D7A5E}
+.banner-he span{color:#0D6E67}
+
+/* PROFILE CARD */
+.profile-card{border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;border:1px solid}
+.profile-card-she{background:var(--green-bg);border-color:var(--green-bd)}
+.profile-card-he{background:var(--teal-bg);border-color:var(--teal-bd)}
+.profile-card-name{font-size:14px;font-weight:600;margin-bottom:6px}
+.profile-card-she .profile-card-name{color:var(--green)}
+.profile-card-he .profile-card-name{color:var(--teal)}
+.profile-stats{display:flex;flex-wrap:wrap;gap:6px}
+.pstat{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--surface);border:1px solid var(--border);color:var(--text2);font-weight:500}
+
+/* DAY SELECTOR */
+.day-selector{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.day-selector::-webkit-scrollbar{display:none}
+.day-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.day-btn.active-she{background:var(--green);color:#fff;border-color:var(--green)}
+.day-btn.active-he{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* MEAL CARD */
+.meal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.meal-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.meal-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.meal-time{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.05em;text-transform:uppercase}
+.meal-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.meal-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.meal-note{font-size:11px;margin-top:6px;font-weight:500}
+.note-she{color:var(--green)}.note-he{color:var(--teal)}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tag{font-size:10px;padding:2px 7px;border-radius:20px;background:var(--bg);color:var(--text2);border:1px solid var(--border);font-weight:500}
+
+/* SÚPER */
+.section-title{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:.04em;text-transform:uppercase;margin:16px 0 10px}
+.reset-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.reset-btn{font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.pbar-wrap{margin-bottom:4px}
+.pbar-track{height:3px;background:var(--border);border-radius:2px;margin-top:4px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:2px;transition:width .3s}
+.pbar-fill-she{background:var(--green)}.pbar-fill-he{background:var(--teal)}
+.super-section{margin-bottom:18px}
+.super-section-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px}
+.super-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px;cursor:pointer;transition:background .1s}
+.super-item:active{background:var(--bg)}
+.super-check{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.super-check.done{background:var(--green);border-color:var(--green)}
+.super-check.done::after{content:'✓';color:#fff;font-size:11px;font-weight:700}
+.super-item-text{font-size:13px;color:var(--text);flex:1}
+.super-item.done .super-item-text{text-decoration:line-through;color:var(--text3)}
+.super-qty{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+/* Add item form */
+.add-item-row{display:flex;gap:6px;margin-top:8px}
+.add-item-row input{flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text)}
+.add-item-row input:focus{outline:none;border-color:var(--green)}
+.add-item-row input.qty-input{width:80px;flex:0 0 80px}
+.add-item-btn{padding:8px 12px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.custom-super-item{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:5px}
+.custom-super-item .super-check{cursor:pointer}
+.del-custom-btn{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0}
+
+/* BUTTONS */
+.gen-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.gen-panel p{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.gen-panel .ptitle{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
+.btn-row{display:flex;gap:8px;margin-bottom:0}
+.btn-she{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;margin-bottom:8px}
+.btn-he{width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;margin-bottom:8px}
+.btn-blue{width:100%;padding:13px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.btn-purple{width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;margin-bottom:8px}
+.btn-half{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s}
+.btn-half-green{background:var(--green);color:#fff}
+.btn-half-teal{background:var(--teal);color:#fff}
+button:disabled{opacity:.5;cursor:not-allowed}
+.btn-clear{width:100%;padding:11px;background:none;color:var(--text2);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:8px}
+
+/* LOADING */
+.loading{text-align:center;padding:24px}
+.loading-dots{display:flex;justify-content:center;gap:6px;margin-bottom:8px}
+.dot{width:8px;height:8px;border-radius:50%;animation:bounce .8s infinite}
+.dot:nth-child(2){animation-delay:.15s}
+.dot:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.loading p{font-size:12px;color:var(--text2)}
+.ai-result{border-radius:var(--radius);padding:14px;margin-top:12px;border:1px solid}
+.ai-result pre{font-family:'DM Sans',sans-serif;font-size:12px;white-space:pre-wrap;line-height:1.6}
+
+/* IMAGE UPLOAD */
+.img-upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;margin-bottom:10px}
+.img-upload-zone:hover{border-color:var(--purple);background:var(--purple-bg)}
+.img-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-upload-zone .zone-icon{font-size:28px;margin-bottom:6px}
+.img-upload-zone p{font-size:12px;color:var(--text2);margin:0}
+.img-preview-wrap{position:relative;margin-bottom:10px}
+.img-preview{width:100%;max-height:220px;object-fit:cover;border-radius:var(--radius-sm);display:block}
+.img-remove-btn{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.5);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.analyze-profile-row{display:flex;gap:6px;margin-bottom:10px}
+.ap-btn{flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text2);transition:all .15s}
+.ap-btn.active-she{background:var(--green);color:#fff;border-color:var(--green)}
+.ap-btn.active-he{background:var(--teal);color:#fff;border-color:var(--teal)}
+.day-badge{display:inline-block;font-size:11px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:3px 10px;margin-bottom:10px;font-weight:500}
+
+/* PROGRESS */
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+.metric-label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace;line-height:1}
+.metric-unit{font-size:12px;color:var(--text2);font-weight:400}
+.metric-delta{font-size:11px;margin-top:4px;font-weight:600}
+.delta-good{color:var(--green)}.delta-bad{color:var(--red)}.delta-neutral{color:var(--text3)}
+.mini-chart-label{font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:500}
+.chart-bars{display:flex;align-items:flex-end;gap:4px;height:50px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;transition:height .3s;min-height:4px}
+.chart-bar-she{background:var(--green-bd)}.chart-bar-she.hl{background:var(--green)}
+.chart-bar-he{background:var(--teal-bd)}.chart-bar-he.hl{background:var(--teal)}
+.chart-bar-val{font-size:9px;font-family:'DM Mono',monospace;color:var(--text3)}
+.chart-bar-lbl{font-size:8px;color:var(--text3);white-space:nowrap}
+.form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.form-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.form-group input{padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:15px;font-family:'DM Mono',monospace;color:var(--text);background:var(--bg);width:100%}
+.form-group input:focus{outline:none}
+.input-she:focus{border-color:var(--green)}.input-he:focus{border-color:var(--teal)}
+.reg-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.reg-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.reg-date{font-size:13px;font-weight:600;color:var(--text)}
+.reg-badge{border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;border:1px solid}
+.badge-base{background:var(--amber-bg);color:var(--amber);border-color:#FCD34D}
+.badge-reg{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
+.badge-reg-he{background:var(--teal-bg);color:var(--teal);border-color:var(--teal-bd)}
+.reg-grid{display:grid;grid-template-columns:repeat(2,1fr)}
+.reg-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.reg-row:nth-child(odd){padding-right:10px;border-right:1px solid var(--border)}
+.reg-row:nth-child(even){padding-left:10px}
+.reg-key{color:var(--text2)}.reg-val{font-weight:600;font-family:'DM Mono',monospace;color:var(--text)}
+.del-reg{background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;line-height:1;padding:0 2px}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-row">
+    <div class="header-title">Plan Nutricional</div>
+    <div class="profile-toggle">
+      <button class="pt-btn she active" onclick="switchProfile('she',this)">👩 Tú</button>
+      <button class="pt-btn he" onclick="switchProfile('he',this)">👨 Él</button>
+    </div>
+  </div>
+  <div id="syncBadge" class="sync-badge">🔄 Cargando datos compartidos…</div>
+</div>
+
+<nav class="nav" id="mainNav">
+  <button class="nav-btn active-she" onclick="switchView('menu',this)">Menú</button>
+  <button class="nav-btn" onclick="switchView('super',this)">Súper</button>
+  <button class="nav-btn" onclick="switchView('prog',this)">Progreso</button>
+  <button class="nav-btn" onclick="switchView('gen',this)">IA</button>
+</nav>
+
+<!-- MENÚ -->
+<div id="view-menu" class="view active">
+  <div id="profileCard"></div>
+  <div id="shakeBanner"></div>
+  <div class="day-selector" id="daySel"></div>
+  <div id="mealsContainer"></div>
+</div>
+
+<!-- SÚPER -->
+<div id="view-super" class="view">
+  <div class="reset-bar">
+    <span class="section-title" style="margin:0">Lista de compras</span>
+    <button class="reset-btn" onclick="resetSuper()">Limpiar todo</button>
+  </div>
+  <div class="pbar-wrap">
+    <div style="display:flex;justify-content:space-between">
+      <span style="font-size:11px;color:var(--text3)">Palomeados</span>
+      <span id="progressText" style="font-size:11px;color:var(--text3)">0 / 0</span>
+    </div>
+    <div class="pbar-track"><div class="pbar-fill pbar-fill-she" id="progressFill" style="width:0%"></div></div>
+  </div>
+  <div id="superContainer" style="margin-top:14px"></div>
+</div>
+
+<!-- PROGRESO -->
+<div id="view-prog" class="view">
+  <div id="summaryCards"></div>
+  <div id="miniCharts"></div>
+  <div class="form-card" id="regForm"></div>
+  <div id="historialContainer"></div>
+</div>
+
+<!-- IA -->
+<div id="view-gen" class="view">
+  <div id="inventoryBanner" style="margin-bottom:12px"></div>
+
+  <!-- 1. GENERAR MENÚ -->
+  <div class="gen-panel">
+    <div class="ptitle">🗓 Menú semanal para los dos</div>
+    <p>Genera 5 días de recetas con porciones específicas para cada perfil, usando tu inventario.</p>
+    <div class="btn-row" style="margin-bottom:0">
+      <button class="btn-half btn-half-green" id="btnGenMedio" onclick="generateMenu('medio')">🥗 Menú Medio</button>
+      <button class="btn-half btn-half-teal" id="btnGenComplejo" onclick="generateMenu('complejo')">👨‍🍳 Menú Complejo</button>
+    </div>
+  </div>
+
+  <!-- 2. LISTA DE LO QUE FALTA -->
+  <div class="gen-panel">
+    <div class="ptitle">🛒 Lista de lo que falta</div>
+    <p>Basada en los productos que aún no tienes palomeados.</p>
+    <button class="btn-blue" id="btnGenSuper" onclick="generateSuperSmart()" style="margin-bottom:0">Generar lista de faltantes ↗️</button>
+  </div>
+
+  <!-- 3. ANALIZAR IMAGEN -->
+  <div class="gen-panel">
+    <div class="ptitle">📸 Analizar lo que estás comiendo</div>
+    <p>Sube foto de tu plato. La IA calcula las porciones y ajusta el menú del día.</p>
+    <div class="analyze-profile-row">
+      <button class="ap-btn active-she" id="apBtnShe" onclick="setAnalyzeProfile('she',this)">👩 Ella</button>
+      <button class="ap-btn" id="apBtnHe" onclick="setAnalyzeProfile('he',this)">👨 Él</button>
+    </div>
+    <div class="day-badge" id="analyzeDayBadge">📅 Analizando: Lunes</div>
+    <div id="imgUploadZone" class="img-upload-zone">
+      <input type="file" accept="image/*" id="imgInput" onchange="onImageSelected(event)">
+      <div class="zone-icon">📷</div>
+      <p>Toca para subir foto o tomar con cámara</p>
+    </div>
+    <div id="imgPreviewWrap" class="img-preview-wrap" style="display:none">
+      <img id="imgPreview" class="img-preview" src="" alt="">
+      <button class="img-remove-btn" onclick="removeImage()">✕</button>
+    </div>
+    <button class="btn-purple" id="btnAnalyze" onclick="analyzeImage()" disabled style="margin-bottom:0">🔍 Analizar porción ↗️</button>
+  </div>
+
+  <div id="genResult"></div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────
+const PROFILES = {
+  she: {
+    name:'Tú', emoji:'👩', cls:'she',
+    stats:['108 kg','IMC 38.3','50% grasa','22% músculo','Cintura 107cm'],
+    shake:'🥤 Shake diario: whey 0 carbs · 300ml leche deslactosada · 1 plátano',
+    shakeNote:'Cubre: 1 fruta + 1 lácteo del desayuno ✓',
+    portions:{ desayuno:{note:'Sin fruta ni lácteo extra'} },
+    baseline:{fecha:'07/06/2026',peso:108,imc:38.3,cintura:107,grasa:50.0,visceral:9.0,musculo:22.0,osea:11.0,residual:21.2,hidra:2.5}
+  },
+  he: {
+    name:'Él', emoji:'👨', cls:'he',
+    stats:['85.1 kg','IMC 28.8','24.5% grasa','48.6% músculo','172cm · 36 años'],
+    shake:'🥤 Shake diario: whey 0 carbs · 300ml leche deslactosada · 1 plátano',
+    shakeNote:'Cubre: 1 fruta + 1 lácteo del desayuno ✓',
+    portions:{ desayuno:{note:'Sin fruta ni lácteo extra — cubre el shake'} },
+    baseline:{fecha:'07/06/2026',peso:85.1,imc:28.8,cintura:null,grasa:24.5,visceral:11,musculo:48.6,osea:3.2,residual:null,hidra:54.4}
+  }
+};
+
+const MENU_BASE = {
+  Lunes:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Huevos rancheros con espinaca',
+     she:'2 huevos enteros (100g) · 1 tortilla maíz (30g) · espinaca cocida (80g) · jitomate (80g) · aceite spray (3 seg)',
+     he:'2 huevos enteros + 1 clara (130g) · 1 tortilla maíz (30g) · espinaca cocida (80g) · jitomate (80g) · aceite spray (3 seg)',
+     tags_she:['3 AOA','2 verdura','1 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Fresas y nuez de castilla',
+     she:'fresas (200g) · nuez de castilla (15g)',he:'fresas (100g) · nuez de castilla (15g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Pollo a la mexicana con verduras',
+     she:'pechuga de pollo (120g) · arroz cocido (70g) · tortilla integral (30g) · brócoli (80g) · zanahoria (50g) · calabacita (60g) · aceite spray',
+     he:'pechuga de pollo (160g) · arroz cocido (47g) · brócoli (80g) · zanahoria (50g) · calabacita (60g) · aceite spray',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Moras y crema de almendras',
+     she:'moras (150g) · crema de almendras (16g)',he:'moras (75g) · crema de almendras (16g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Tostadas de atún mexicano',
+     she:'atún en agua escurrido (120g) · tostadas de maíz (2 pzas / 30g) · aguacate (60g) · jitomate (80g) · cebolla (30g)',
+     he:'atún en agua escurrido (120g) · tostada de maíz (1 pza / 15g) · aguacate (30g) · jitomate (80g) · cebolla (30g)',
+     tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ],
+  Martes:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Omelette de claras con queso panela',
+     she:'claras (90g) + 1 huevo (50g) · panela (40g) · champiñones (60g) · espinaca (50g) · pan integral 2 reb (60g) · aceite spray',
+     he:'2 huevos (100g) + 2 claras (60g) · panela (40g) · champiñones (60g) · espinaca (50g) · pan integral 1 reb (30g) · aceite spray',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Guayaba y cacahuates',
+     she:'guayaba (200g) · cacahuates naturales (20g)',he:'guayaba (100g) · cacahuates naturales (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Salmón a la plancha con ensalada',
+     she:'salmón (120g) · lechuga (60g) · pepino (80g) · jícama (60g) · betabel cocido (60g) · papa cocida (70g) · aceite oliva (5g)',
+     he:'salmón (160g) · lechuga (60g) · pepino (80g) · jícama (60g) · papa cocida (47g) · aceite oliva (5g)',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Manzana y almendras',
+     she:'manzana (150g) · almendras (20g)',he:'manzana (75g) · almendras (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Quesadillas de pollo',
+     she:'pechuga desmenuzada (80g) · tortillas maíz 2 pzas (60g) · queso Oaxaca light (30g) · calabacita (80g) · cebolla (30g)',
+     he:'pechuga desmenuzada (100g) · tortilla maíz 1 pza (30g) · queso Oaxaca light (20g) · calabacita (80g) · cebolla (30g)',
+     tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ],
+  Miércoles:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Chilaquiles verdes saludables',
+     she:'pechuga desmenuzada (80g) · tortillas horneadas 2 pzas (60g) · salsa verde (80g) · acelga cocida (80g) · aceite spray',
+     he:'pechuga desmenuzada (80g) · tortilla horneada 1 pza (30g) · salsa verde (80g) · acelga cocida (80g) · aceite spray',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Tuna y nuez de la India',
+     she:'tuna pelada (200g) · nuez de la India (20g)',he:'tuna pelada (100g) · nuez de la India (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Caldo de pollo con verduras',
+     she:'pechuga (120g) · arroz cocido (70g) · zanahoria (60g) · chayote (80g) · ejote (60g) · aceite spray',
+     he:'pechuga (160g) · arroz cocido (47g) · zanahoria (60g) · chayote (80g) · ejote (60g) · aceite spray',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Piña y avellanas',
+     she:'piña fresca (150g) · avellanas (20g)',he:'piña fresca (75g) · avellanas (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Ensalada de atún con aguacate',
+     she:'atún escurrido (120g) · lechuga (60g) · jitomate (80g) · pepino (60g) · aguacate (40g) · galletas habaneras 2 pzas',
+     he:'atún escurrido (120g) · lechuga (60g) · jitomate (80g) · pepino (60g) · aguacate (20g) · galleta habanera 1 pza',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']}
+  ],
+  Jueves:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Huevos revueltos con jamón de pavo',
+     she:'2 huevos (100g) · jamón pavo (60g) · pimiento (50g) · cebolla (30g) · jitomate (60g) · pan integral 2 reb (60g) · aceite spray',
+     he:'2 huevos + 1 clara (130g) · jamón pavo (60g) · pimiento (50g) · cebolla (30g) · jitomate (60g) · pan integral 1 reb (30g) · aceite spray',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Durazno y nuez de castilla',
+     she:'durazno (200g) · nuez de castilla (15g)',he:'durazno (100g) · nuez de castilla (15g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Pechuga con nopales y frijoles',
+     she:'pechuga (120g) · nopales cocidos (100g) · frijoles negros (80g) · arroz (47g) · tortilla maíz (30g) · aceite spray',
+     he:'pechuga (160g) · nopales cocidos (100g) · frijoles negros (80g) · arroz (47g) · aceite spray',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Moras y crema de cacahuate',
+     she:'moras azules (150g) · crema de cacahuate (16g)',he:'moras azules (75g) · crema de cacahuate (16g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Tacos de atún a la mexicana',
+     she:'atún escurrido (120g) · tortillas maíz 2 pzas (60g) · jitomate (80g) · cebolla (30g) · aguacate (40g) · cilantro',
+     he:'atún escurrido (120g) · tortilla maíz 1 pza (30g) · jitomate (80g) · cebolla (30g) · aguacate (20g) · cilantro',
+     tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ],
+  Viernes:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Tostadas de requesón con verduras',
+     she:'requesón (40g) · claras cocidas (90g) · tostadas integrales 2 pzas (30g) · jitomate (60g) · lechuga (40g) · pepino (60g)',
+     he:'requesón (40g) · claras cocidas (60g) · tostada integral 1 pza (15g) · jitomate (60g) · lechuga (40g) · pepino (60g)',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Guayaba y almendras',
+     she:'guayaba (200g) · almendras (20g)',he:'guayaba (100g) · almendras (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Pescado al horno con verduras',
+     she:'filete de pescado (120g) · espárragos (80g) · pimiento (60g) · calabacita (70g) · papa cocida (70g) · tortilla integral (30g) · aceite oliva',
+     he:'filete de pescado (160g) · espárragos (80g) · pimiento (60g) · calabacita (70g) · papa cocida (47g) · aceite oliva',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Melón y crema de almendras',
+     she:'melón (200g) · crema de almendras (16g)',he:'melón (100g) · crema de almendras (16g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Sopa de pollo con verduras',
+     she:'pechuga desmenuzada (80g) · calabacita (60g) · zanahoria (50g) · chayote (70g) · tortillas maíz 2 pzas (60g)',
+     he:'pechuga desmenuzada (100g) · calabacita (60g) · zanahoria (50g) · chayote (70g) · tortilla maíz 1 pza (30g)',
+     tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ]
+};
+
+const SUPER_BASE = {
+  "🥩 Proteínas":[["Pechuga de pollo","1.5 kg"],["Filete de salmón","350g"],["Atún en agua lata","x5"],["Filete de pescado","400g"],["Jamón de pavo","1 paquete"],["Huevos","1 docena"],["Requesón","200g"],["Queso panela","200g"],["Queso Oaxaca light","100g"]],
+  "🥦 Verduras":[["Espinaca","1 bolsa"],["Brócoli","1 cabeza"],["Zanahoria","500g"],["Calabacita","4 pzas"],["Jitomate","6 pzas"],["Cebolla","3 pzas"],["Champiñones","200g"],["Pepino","2 pzas"],["Lechuga","1 cabeza"],["Nopales","4 pzas"],["Chayote","2 pzas"],["Ejote","200g"],["Espárragos","1 manojo"],["Pimiento","2 pzas"],["Jícama","1 pza"],["Betabel","2 pzas"],["Apio","1 manojo"],["Chile serrano","al gusto"],["Acelga","1 manojo"]],
+  "🍎 Frutas":[["Fresas","500g"],["Moras azules","250g"],["Guayaba","8 pzas"],["Durazno","6 pzas"],["Manzana","4 pzas"],["Tuna","4 pzas"],["Piña","1 pequeña"],["Melón","1 pequeño"],["Limones","8 pzas"],["Plátanos","5 pzas (shake diario)"]],
+  "🌽 Cereales":[["Tortillas de maíz","1 paquete"],["Pan integral","1 barra"],["Tortillas integrales","1 paquete"],["Arroz integral","500g"],["Tostadas de maíz","1 paquete"],["Galletas habaneras integrales","1 caja"]],
+  "🥑 Grasas y frutos secos":[["Aceite de oliva","1 botella"],["Aceite en spray","1 lata"],["Aguacate","3 pzas"],["Nuez de castilla","100g"],["Almendras","100g"],["Cacahuates naturales","100g"],["Nuez de la India","100g"],["Avellanas","50g"],["Crema de almendras","1 frasco"],["Crema de cacahuate natural","1 frasco"]],
+  "🥛 Lácteos y shake":[["Yogur griego natural","750g"],["Leche deslactosada Costco","3L"],["Whey protein 0 carbs","(bote actual)"]],
+  "🫘 Despensa":[["Frijoles negros","1 lata"],["Caldo de pollo natural","1 caja"],["Salsa verde","1 frasco"],["Cilantro","1 manojo"],["Ajo","1 cabeza"],["Epazote","al gusto"]]
+};
+
+const FIELDS = [
+  {key:'peso',label:'Peso',unit:'kg',good:'down'},{key:'imc',label:'IMC',unit:'',good:'down'},
+  {key:'cintura',label:'Cintura',unit:'cm',good:'down'},{key:'grasa',label:'Grasa corporal',unit:'%',good:'down'},
+  {key:'visceral',label:'Grasa visceral',unit:'',good:'down'},{key:'musculo',label:'Músculo',unit:'%',good:'up'},
+  {key:'osea',label:'Masa ósea',unit:'',good:'up'},{key:'residual',label:'Masa residual',unit:'%',good:'neutral'},
+  {key:'hidra',label:'Hidratación',unit:'',good:'up'}
+];
+
+// ─── STATE ───────────────────────────────────────────────
+let profile = 'she';
+let currentDay = 'Lunes';
+let checked = {};
+let customItems = {}; // { "🥩 Proteínas": [{id, name, qty}], ... }
+let registros = { she:[], he:[] };
+let analyzeProfile = 'she';
+let imageBase64 = null;
+let imageMimeType = null;
+
+// ─── STORAGE ─────────────────────────────────────────────
+function setSyncBadge(s){
+  const el=document.getElementById('syncBadge');if(!el)return;
+  if(s==='ok'){el.textContent='☁️ Datos compartidos activos';el.className='sync-badge ok';}
+  else if(s==='saving'){el.textContent='💾 Guardando…';el.className='sync-badge saving';}
+  else if(s==='error'){el.textContent='⚠️ Sin conexión al servidor';el.className='sync-badge';}
+  else{el.textContent='🔄 Cargando datos…';el.className='sync-badge';}
+}
+async function apiGet(k){
+  try{const r=await fetch('/api/storage/'+encodeURIComponent(k));if(!r.ok)return null;const d=await r.json();return d.value||null;}
+  catch(e){return null;}
+}
+async function apiSet(k,v){
+  await fetch('/api/storage/'+encodeURIComponent(k),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:v})});
+}
+async function loadData(){
+  setSyncBadge('loading');
+  checked=JSON.parse((await apiGet('superChecked'))||'{}');
+  customItems=JSON.parse((await apiGet('superCustomItems'))||'{}');
+  registros.she=JSON.parse((await apiGet('reg_she'))||'[]');
+  registros.he=JSON.parse((await apiGet('reg_he'))||'[]');
+  setSyncBadge('ok');
+}
+async function saveChecked(){
+  setSyncBadge('saving');
+  try{await apiSet('superChecked',JSON.stringify(checked));setSyncBadge('ok');}
+  catch(e){setSyncBadge('error');}
+}
+async function saveCustom(){
+  setSyncBadge('saving');
+  try{await apiSet('superCustomItems',JSON.stringify(customItems));setSyncBadge('ok');}
+  catch(e){setSyncBadge('error');}
+}
+async function saveRegistros(p){
+  setSyncBadge('saving');
+  try{await apiSet('reg_'+p,JSON.stringify(registros[p]));setSyncBadge('ok');}
+  catch(e){setSyncBadge('error');}
+}
+
+// ─── PROFILE / VIEW ──────────────────────────────────────
+function switchProfile(p,btn){
+  profile=p;
+  document.querySelectorAll('.pt-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const an=document.querySelector('.nav-btn.active-she, .nav-btn.active-he');
+  if(an) an.className='nav-btn active-'+p;
+  renderAll();
+}
+function switchView(v,btn){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active-she','active-he'));
+  document.getElementById('view-'+v).classList.add('active');
+  btn.classList.add('active-'+profile);
+  if(v==='prog') renderProg();
+  if(v==='gen'){ renderInventoryBanner(); updateAnalyzeBadge(); }
+}
+function renderAll(){
+  renderProfileCard(); renderShakeBanner(); renderDays(); renderMeals();
+  renderProg(); renderInventoryBanner(); renderForm(); updateAnalyzeBadge();
+}
+
+// ─── MENU ────────────────────────────────────────────────
+function renderProfileCard(){
+  const pr=PROFILES[profile];
+  document.getElementById('profileCard').innerHTML=`<div class="profile-card profile-card-${pr.cls}">
+    <div class="profile-card-name">${pr.emoji} ${pr.name}</div>
+    <div class="profile-stats">${pr.stats.map(s=>`<span class="pstat">${s}</span>`).join('')}</div>
+  </div>`;
+}
+function renderShakeBanner(){
+  const pr=PROFILES[profile],el=document.getElementById('shakeBanner');
+  if(!pr.shake){el.innerHTML='';return;}
+  el.innerHTML=`<div class="banner banner-${pr.cls}"><p>${pr.shake}</p><span>${pr.shakeNote}</span></div>`;
+}
+function renderDays(){
+  const sel=document.getElementById('daySel');sel.innerHTML='';
+  Object.keys(MENU_BASE).forEach(day=>{
+    const b=document.createElement('button');
+    b.className='day-btn'+(day===currentDay?' active-'+profile:'');
+    b.textContent=day;
+    b.onclick=()=>{ currentDay=day; updateAnalyzeBadge(); renderDays(); renderMeals(); };
+    sel.appendChild(b);
+  });
+}
+function renderMeals(){
+  const c=document.getElementById('mealsContainer');c.innerHTML='';
+  const pr=PROFILES[profile];
+  MENU_BASE[currentDay].forEach(m=>{
+    const div=document.createElement('div');div.className='meal-card';
+    div.innerHTML=`
+      <div class="meal-header"><div class="meal-icon" style="background:${m.bg}">${m.icon}</div><span class="meal-time">${m.time}</span></div>
+      <div class="meal-name">${m.name}</div>
+      <div class="meal-desc">${m[profile]}</div>
+      ${m.time==='Desayuno'?`<div class="meal-note note-${profile}">✓ ${pr.portions.desayuno.note}</div>`:''}
+      <div class="tags">${m['tags_'+profile].map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+    c.appendChild(div);
+  });
+}
+
+// ─── SÚPER ───────────────────────────────────────────────
+function renderSuper(data){
+  const c=document.getElementById('superContainer');c.innerHTML='';
+  let total=0,done=0;
+  Object.entries(data).forEach(([cat,items])=>{
+    const sec=document.createElement('div');sec.className='super-section';
+    sec.innerHTML=`<div class="super-section-title">${cat}</div>`;
+
+    // Items base
+    items.forEach(([name,qty],i)=>{
+      const key=cat+'_'+i,isDone=!!checked[key];
+      if(isDone)done++;total++;
+      const item=document.createElement('div');
+      item.className='super-item'+(isDone?' done':'');
+      item.innerHTML=`<div class="super-check${isDone?' done':''}"></div><span class="super-item-text">${name}</span><span class="super-qty">${qty}</span>`;
+      item.onclick=async()=>{ checked[key]=!checked[key]; await saveChecked(); renderSuper(data); renderInventoryBanner(); };
+      sec.appendChild(item);
+    });
+
+    // Items custom
+    const catCustom=customItems[cat]||[];
+    catCustom.forEach((ci,ci_idx)=>{
+      const key='custom_'+cat+'_'+ci.id,isDone=!!checked[key];
+      if(isDone)done++;total++;
+      const wrap=document.createElement('div');wrap.className='custom-super-item'+(isDone?' done':'');
+      const chk=document.createElement('div');chk.className='super-check'+(isDone?' done':'');
+      chk.onclick=async(e)=>{ e.stopPropagation(); checked[key]=!checked[key]; await saveChecked(); renderSuper(data); renderInventoryBanner(); };
+      const txt=document.createElement('span');txt.className='super-item-text';txt.textContent=ci.name;
+      const qty=document.createElement('span');qty.className='super-qty';qty.textContent=ci.qty;
+      const del=document.createElement('button');del.className='del-custom-btn';del.textContent='🗑';del.title='Eliminar';
+      del.onclick=async(e)=>{
+        e.stopPropagation();
+        customItems[cat]=customItems[cat].filter(x=>x.id!==ci.id);
+        delete checked[key];
+        await saveChecked(); await saveCustom();
+        renderSuper(data); renderInventoryBanner();
+      };
+      wrap.appendChild(chk);wrap.appendChild(txt);wrap.appendChild(qty);wrap.appendChild(del);
+      sec.appendChild(wrap);
+    });
+
+    // Formulario agregar
+    const catId=cat.replace(/[^a-zA-Z0-9]/g,'_');
+    const addRow=document.createElement('div');addRow.className='add-item-row';
+    addRow.innerHTML=`
+      <input type="text" placeholder="Agregar artículo…" id="inp_name_${catId}" onkeydown="if(event.key==='Enter')addCustomItem('${cat}')">
+      <input type="text" placeholder="Cantidad" id="inp_qty_${catId}" class="qty-input" onkeydown="if(event.key==='Enter')addCustomItem('${cat}')">
+      <button class="add-item-btn" onclick="addCustomItem('${cat}')">＋</button>`;
+    sec.appendChild(addRow);
+    c.appendChild(sec);
+  });
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('progressText').textContent=done+' / '+total;
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+async function addCustomItem(cat){
+  const catId=cat.replace(/[^a-zA-Z0-9]/g,'_');
+  const nameEl=document.getElementById('inp_name_'+catId);
+  const qtyEl=document.getElementById('inp_qty_'+catId);
+  const name=(nameEl?.value||'').trim();
+  const qty=(qtyEl?.value||'').trim()||'—';
+  if(!name) return;
+  if(!customItems[cat]) customItems[cat]=[];
+  customItems[cat].push({id:Date.now(),name,qty});
+  await saveCustom();
+  renderSuper(SUPER_BASE);
+  renderInventoryBanner();
+}
+
+async function resetSuper(){
+  if(confirm('¿Limpiar todos los palomeos? (no borra artículos manuales)')){
+    checked={};
+    await saveChecked();
+    renderSuper(SUPER_BASE);
+  }
+}
+
+// ─── PROGRESO ────────────────────────────────────────────
+function renderProg(){
+  renderForm();
+  const pr=PROFILES[profile],regs=registros[profile];
+  const latest=regs.length?regs[regs.length-1]:null;
+  const compare=latest||pr.baseline,isBase=!latest;
+  const keyMetrics=profile==='she'?['peso','grasa','musculo','cintura']:['peso','grasa','musculo','visceral'];
+  const sc=document.getElementById('summaryCards');
+  sc.innerHTML='<div class="metric-grid">'+keyMetrics.map(k=>{
+    const f=FIELDS.find(x=>x.key===k),cur=compare[k];
+    if(cur===null||cur===undefined)return'';
+    const base=pr.baseline[k],diff=isBase?null:(cur-base);
+    let dHtml='';
+    if(diff!==null){
+      const isGood=(f.good==='down'&&diff<0)||(f.good==='up'&&diff>0);
+      const cls=diff===0?'delta-neutral':(isGood?'delta-good':'delta-bad');
+      dHtml=`<div class="metric-delta ${cls}">${diff>0?'↑':'↓'} ${diff>0?'+':''}${Math.abs(diff).toFixed(1)} vs inicio</div>`;
+    } else dHtml='<div class="metric-delta delta-neutral">Medición inicial</div>';
+    return `<div class="metric-card"><div class="metric-label">${f.label}</div><div class="metric-value">${cur}<span class="metric-unit">${f.unit}</span></div>${dHtml}</div>`;
+  }).join('')+'</div>';
+
+  const mc=document.getElementById('miniCharts');
+  const pesoData=[{v:pr.baseline.peso,l:'Inicio'},...regs.map((r,i)=>({v:r.peso,l:'S'+(i+1)}))];
+  if(pesoData.length>1){
+    const min=Math.min(...pesoData.map(d=>d.v))-2,max=Math.max(...pesoData.map(d=>d.v))+2,range=max-min||1;
+    mc.innerHTML=`<div class="form-card" style="padding:14px;margin-bottom:14px">
+      <div class="mini-chart-label">Evolución de peso — ${pr.emoji} ${pr.name} (kg)</div>
+      <div class="chart-bars">${pesoData.map((d,i)=>{
+        const h=Math.round(((d.v-min)/range)*44)+6,isLast=i===pesoData.length-1;
+        return `<div class="chart-bar-wrap"><div class="chart-bar-val">${d.v}</div><div class="chart-bar chart-bar-${profile}${isLast?' hl':''}" style="height:${h}px"></div><div class="chart-bar-lbl">${d.l}</div></div>`;
+      }).join('')}</div></div>`;
+  } else mc.innerHTML='';
+
+  const hc=document.getElementById('historialContainer');
+  const allRegs=[{...pr.baseline,_base:true},...regs];
+  hc.innerHTML=allRegs.slice().reverse().map((r,idx)=>{
+    const isB=!!r._base,realIdx=allRegs.length-1-idx;
+    const badgeCls=isB?'badge-base':(profile==='she'?'badge-reg':'badge-reg-he');
+    const rows=FIELDS.map(f=>{const v=r[f.key];if(v===null||v===undefined)return'';return`<div class="reg-row"><span class="reg-key">${f.label}</span><span class="reg-val">${v}${f.unit}</span></div>`;}).join('');
+    const delBtn=isB?'':`<button class="del-reg" onclick="deleteRegistro(${realIdx})">×</button>`;
+    return `<div class="reg-card"><div class="reg-header"><span class="reg-date">${r.fecha}</span><div style="display:flex;align-items:center;gap:8px"><span class="reg-badge ${badgeCls}">${isB?'Inicial':'Registro'}</span>${delBtn}</div></div><div class="reg-grid">${rows}</div></div>`;
+  }).join('');
+}
+function renderForm(){
+  const pr=PROFILES[profile],ic='input-'+profile;
+  document.getElementById('regForm').innerHTML=`
+    <div class="form-title">Registrar medición — ${pr.emoji} ${pr.name}</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Fecha</label><input type="date" id="f-fecha" class="${ic}"></div>
+      <div class="form-group"><label>Peso (kg)</label><input type="number" id="f-peso" class="${ic}" placeholder="${pr.baseline.peso}" step="0.1"></div>
+      <div class="form-group"><label>IMC</label><input type="number" id="f-imc" class="${ic}" placeholder="${pr.baseline.imc}" step="0.1"></div>
+      <div class="form-group"><label>${profile==='she'?'Cintura (cm)':'Grasa visceral'}</label><input type="number" id="f-extra" class="${ic}" placeholder="${profile==='she'?pr.baseline.cintura:pr.baseline.visceral}" step="0.5"></div>
+      <div class="form-group"><label>Grasa %</label><input type="number" id="f-grasa" class="${ic}" placeholder="${pr.baseline.grasa}" step="0.1"></div>
+      <div class="form-group"><label>Músculo %</label><input type="number" id="f-musculo" class="${ic}" placeholder="${pr.baseline.musculo}" step="0.1"></div>
+      <div class="form-group"><label>Masa ósea</label><input type="number" id="f-osea" class="${ic}" placeholder="${pr.baseline.osea}" step="0.1"></div>
+      <div class="form-group"><label>Hidratación</label><input type="number" id="f-hidra" class="${ic}" placeholder="${pr.baseline.hidra}" step="0.1"></div>
+    </div>
+    <button class="${profile==='she'?'btn-she':'btn-he'}" onclick="saveRegistro()" style="margin-bottom:0">Guardar medición</button>`;
+  const fi=document.getElementById('f-fecha');if(fi)fi.valueAsDate=new Date();
+}
+async function saveRegistro(){
+  const g=id=>{const v=document.getElementById(id)?.value;return v?parseFloat(v):null;};
+  const fecha=document.getElementById('f-fecha')?.value;
+  if(!fecha){alert('Por favor ingresa la fecha');return;}
+  const fmt=new Date(fecha+'T12:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const reg={fecha:fmt,peso:g('f-peso'),imc:g('f-imc'),grasa:g('f-grasa'),musculo:g('f-musculo'),osea:g('f-osea'),hidra:g('f-hidra')};
+  if(profile==='she'){reg.cintura=g('f-extra');reg.visceral=null;}
+  else{reg.visceral=g('f-extra');reg.cintura=null;}
+  if(!reg.peso){alert('El peso es obligatorio');return;}
+  registros[profile].push(reg);
+  await saveRegistros(profile);
+  renderProg();
+}
+async function deleteRegistro(idx){
+  if(confirm('¿Eliminar este registro?')){
+    registros[profile].splice(idx,1);
+    await saveRegistros(profile);
+    renderProg();
+  }
+}
+
+// ─── IA ──────────────────────────────────────────────────
+function getInventory(){
+  const have=[],missing=[];
+  Object.entries(SUPER_BASE).forEach(([cat,items])=>{
+    items.forEach(([name],i)=>{ const key=cat+'_'+i; if(checked[key])have.push(name);else missing.push(name); });
+  });
+  Object.entries(customItems).forEach(([cat,items])=>{
+    items.forEach(ci=>{ const key='custom_'+cat+'_'+ci.id; if(checked[key])have.push(ci.name);else missing.push(ci.name); });
+  });
+  return {have,missing};
+}
+
+function renderInventoryBanner(){
+  const el=document.getElementById('inventoryBanner');if(!el)return;
+  const {have,missing}=getInventory();
+  if(!have.length&&!missing.length){el.innerHTML='';return;}
+  el.innerHTML=`<div class="banner banner-${profile}">
+    <p>📦 Inventario detectado</p>
+    <span>✅ Tienes en casa: ${have.length} productos</span>
+    <span>🛒 Falta comprar: ${missing.length} productos</span>
+    <span style="margin-top:4px;opacity:.8">Los menús y la lista se generan con esta info.</span>
+  </div>`;
+}
+
+async function callClaude(messages,maxTokens=1400){
+  const res=await fetch('/api/claude',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages})
+  });
+  const data=await res.json();
+  if(data.error)throw new Error(data.error);
+  return data.content.map(b=>b.text||'').join('');
+}
+
+async function generateMenu(tipo){
+  const btnId=tipo==='medio'?'btnGenMedio':'btnGenComplejo';
+  const btn=document.getElementById(btnId),res=document.getElementById('genResult');
+  btn.disabled=true;
+  const dotColor=tipo==='medio'?'var(--green)':'var(--teal)';
+  const tipoLabel=tipo==='medio'?'🥗 Menú Medio':'👨‍🍳 Menú Complejo';
+  res.innerHTML=`<div class="loading"><div class="loading-dots"><div class="dot" style="background:${dotColor}"></div><div class="dot" style="background:${dotColor}"></div><div class="dot" style="background:${dotColor}"></div></div><p>Generando ${tipoLabel}…</p></div>`;
+  const {have,missing}=getInventory();
+  const tipoDesc=tipo==='medio'
+    ?'Recetas simples y rápidas (máx 25 min), pocos ingredientes, comida casera cotidiana mexicana.'
+    :'Recetas elaboradas con técnicas variadas (marinados, horneados, salteados), múltiples ingredientes, cocina mexicana saludable y gourmet.';
+  const prompt=`Eres nutriólogo. Genera menú de 5 días (LUNES a VIERNES) para DOS personas con porciones distintas.
+
+TIPO: ${tipoLabel} — ${tipoDesc}
+
+👩 ELLA (108kg, IMC 38.3, 50% grasa, meta bajar grasa) — toma shake diario (whey+leche+plátano = 1 fruta + 1 lácteo), NO agrega fruta ni lácteo al desayuno.
+Porciones:
+Desayuno: 3 AOA, 2 verdura, 2 cereal, 1 grasa
+Media mañana: 2 fruta, 1 grasa c/proteína
+Comida: 3 AOA, 3 cereal, 2 verdura, 2 grasa
+Merienda: 2 fruta, 1 grasa c/proteína
+Cena: 3 AOA, 2 cereal, 2 verdura, 1 grasa
+
+👨 ÉL (85.1kg, IMC 28.8, 48.6% músculo, meta mantener músculo + bajar grasa) — también toma shake diario, desayuno SIN fruta/lácteo extra.
+Porciones:
+Desayuno: 3 AOA, 2 verdura, 1 cereal, 1 grasa
+Media mañana: 1 fruta, 1 grasa c/proteína
+Comida: 4 AOA, 2 cereal, 2 verdura, 1 grasa
+Merienda: 1 fruta, 1 grasa c/proteína
+Cena: 3 AOA, 1 cereal, 2 verdura, 1 grasa
+
+INVENTARIO (prioriza lo disponible):
+Tienen: ${have.join(', ')||'ninguno'}
+Falta: ${missing.join(', ')||'ninguno'}
+
+FORMATO (sin markdown, sin asteriscos):
+DÍA 1 - LUNES
+Desayuno: [nombre]
+  Preparación: [instrucción breve]
+  Ella: [ingredientes con gramos]
+  Él: [ingredientes con gramos]
+
+Media mañana: [nombre]
+  Ella: [ingredientes]
+  Él: [ingredientes]
+
+Comida: [nombre]
+  Preparación: [instrucción breve]
+  Ella: [ingredientes con gramos]
+  Él: [ingredientes con gramos]
+
+Merienda: [nombre]
+  Ella: [ingredientes]
+  Él: [ingredientes]
+
+Cena: [nombre]
+  Preparación: [instrucción breve]
+  Ella: [ingredientes con gramos]
+  Él: [ingredientes con gramos]
+
+(repetir DÍA 2 a DÍA 5)`;
+  try{
+    const text=await callClaude([{role:'user',content:prompt}],1800);
+    const bg=tipo==='medio'?'var(--green-bg)':'var(--teal-bg)';
+    const bd=tipo==='medio'?'var(--green-bd)':'var(--teal-bd)';
+    const col=tipo==='medio'?'var(--green)':'var(--teal)';
+    res.innerHTML=`<div class="ai-result" style="background:${bg};border-color:${bd}"><pre style="color:${col}">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
+  }catch(e){
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error al conectar. Intenta de nuevo.</pre></div>`;
+  }
+  btn.disabled=false;
+}
+
+async function generateSuperSmart(){
+  const btn=document.getElementById('btnGenSuper'),res=document.getElementById('genResult');
+  btn.disabled=true;
+  res.innerHTML=`<div class="loading"><div class="loading-dots"><div class="dot" style="background:var(--blue)"></div><div class="dot" style="background:var(--blue)"></div><div class="dot" style="background:var(--blue)"></div></div><p>Calculando lo que falta…</p></div>`;
+  const {have,missing}=getInventory();
+  const prompt=`Eres nutriólogo. Genera lista del súper para lo que falta comprar para una semana de 5 días para DOS personas: ella (108kg, meta bajar grasa) y él (85.1kg, 48.6% músculo). Ambos toman shake diario.\n\nTienen en casa: ${have.join(', ')||'ninguno'}\nFalta: ${missing.join(', ')||'ninguno'}\n\nSi la lista es corta, agrega ingredientes frescos de temporada en México (junio). Indica cantidades para 2 personas.\n\nFormato sin markdown:\nPROTEÍNAS:\n- [producto] | [cantidad]\nVERDURAS:\n- [producto] | [cantidad]\nFRUTAS:\n- [producto] | [cantidad]\nCEREALES:\n- [producto] | [cantidad]\nGRASAS Y FRUTOS SECOS:\n- [producto] | [cantidad]\nDESPENSA:\n- [producto] | [cantidad]`;
+  try{
+    const text=await callClaude([{role:'user',content:prompt}]);
+    res.innerHTML=`<div class="ai-result" style="background:var(--blue-bg);border-color:#BFDBFE"><pre style="color:var(--blue)">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
+  }catch(e){
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error. Intenta de nuevo.</pre></div>`;
+  }
+  btn.disabled=false;
+}
+
+// ─── IMAGEN ──────────────────────────────────────────────
+function setAnalyzeProfile(p,btn){
+  analyzeProfile=p;
+  document.querySelectorAll('.ap-btn').forEach(b=>b.classList.remove('active-she','active-he'));
+  btn.classList.add('active-'+p);
+}
+function updateAnalyzeBadge(){
+  const el=document.getElementById('analyzeDayBadge');
+  if(el) el.textContent='📅 Analizando: '+currentDay;
+}
+function onImageSelected(e){
+  const file=e.target.files[0];if(!file)return;
+  imageMimeType=file.type||'image/jpeg';
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const result=ev.target.result;
+    imageBase64=result.split(',')[1];
+    const preview=document.getElementById('imgPreview');
+    const wrap=document.getElementById('imgPreviewWrap');
+    const zone=document.getElementById('imgUploadZone');
+    preview.src=result;
+    wrap.style.display='block';
+    zone.style.display='none';
+    document.getElementById('btnAnalyze').disabled=false;
+  };
+  reader.readAsDataURL(file);
+}
+function removeImage(){
+  imageBase64=null;imageMimeType=null;
+  document.getElementById('imgPreview').src='';
+  document.getElementById('imgPreviewWrap').style.display='none';
+  document.getElementById('imgUploadZone').style.display='block';
+  document.getElementById('imgInput').value='';
+  document.getElementById('btnAnalyze').disabled=true;
+}
+async function analyzeImage(){
+  if(!imageBase64){alert('Primero sube una imagen');return;}
+  const btn=document.getElementById('btnAnalyze'),res=document.getElementById('genResult');
+  btn.disabled=true;
+  res.innerHTML=`<div class="loading"><div class="loading-dots"><div class="dot" style="background:var(--purple)"></div><div class="dot" style="background:var(--purple)"></div><div class="dot" style="background:var(--purple)"></div></div><p>Analizando el plato…</p></div>`;
+  const pr=PROFILES[analyzeProfile];
+  const dayMeals=MENU_BASE[currentDay].map(m=>`${m.time}: ${m.name} | ${m[analyzeProfile]}`).join('\n');
+  const prompt=`Eres nutriólogo especializado en el sistema mexicano de equivalentes alimentarios.
+
+Analiza esta imagen de comida para ${pr.emoji} ${pr.name} (${pr.stats.join(', ')}).
+
+MENÚ PLANEADO PARA HOY (${currentDay}):
+${dayMeals}
+
+Realiza lo siguiente:
+1. Identifica los alimentos en la imagen y estima las cantidades en gramos visualmente.
+2. Calcula las porciones según el sistema de equivalentes: AOA, verdura, cereal, grasa, fruta, lácteo.
+3. Compara con el menú del día: ¿a cuál tiempo de comida corresponde esta foto? ¿Las porciones son correctas para este perfil?
+4. Indica si este platillo:
+   - ✅ REEMPLAZA una comida del plan (¿cuál?)
+   - ➕ AGREGA calorías extra al día (¿qué eliminar del resto del menú para compensar?)
+   - ⚖️ ESTÁ DENTRO del plan con ajuste de porciones
+5. Da una recomendación concreta de qué comer en el resto del día.
+
+Responde en español, sin markdown, de forma clara y práctica.`;
+  try{
+    const text=await callClaude([{role:'user',content:[
+      {type:'image',source:{type:'base64',media_type:imageMimeType,data:imageBase64}},
+      {type:'text',text:prompt}
+    ]}]);
+    res.innerHTML=`<div class="ai-result" style="background:var(--purple-bg);border-color:var(--purple-bd)"><pre style="color:var(--purple)">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
+  }catch(e){
+    res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error al analizar. Intenta de nuevo.</pre></div>`;
+  }
+  btn.disabled=false;
+}
+
+// ─── INIT ────────────────────────────────────────────────
+loadData().then(()=>{
+  renderAll();
+  renderSuper(SUPER_BASE);
+});
+</script>
+</body>
+</html>
