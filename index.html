@@ -448,19 +448,35 @@ function setSyncBadge(s){
   else{el.textContent='🔄 Cargando datos…';el.className='sync-badge';}
 }
 async function apiGet(k){
-  try{const r=await fetch('/api/storage/'+encodeURIComponent(k));if(!r.ok)return null;const d=await r.json();return d.value||null;}
-  catch(e){return null;}
+  try{
+    const ctrl=new AbortController();
+    const id=setTimeout(()=>ctrl.abort(),4000);
+    const r=await fetch('/api/storage/'+encodeURIComponent(k),{signal:ctrl.signal});
+    clearTimeout(id);
+    if(!r.ok)return null;
+    const d=await r.json();return d.value||null;
+  }catch(e){return null;}
 }
 async function apiSet(k,v){
   await fetch('/api/storage/'+encodeURIComponent(k),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:v})});
 }
 async function loadData(){
   setSyncBadge('loading');
-  checked=JSON.parse((await apiGet('superChecked'))||'{}');
-  customItems=JSON.parse((await apiGet('superCustomItems'))||'{}');
-  registros.she=JSON.parse((await apiGet('reg_she'))||'[]');
-  registros.he=JSON.parse((await apiGet('reg_he'))||'[]');
-  setSyncBadge('ok');
+  const tout=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+  try{
+    const [c,ci,rs,rh]=await tout(Promise.all([
+      apiGet('superChecked'),apiGet('superCustomItems'),apiGet('reg_she'),apiGet('reg_he')
+    ]),5000);
+    checked=JSON.parse(c||'{}');
+    customItems=JSON.parse(ci||'{}');
+    registros.she=JSON.parse(rs||'[]');
+    registros.he=JSON.parse(rh||'[]');
+    setSyncBadge('ok');
+  }catch(e){
+    console.warn('loadData:',e.message);
+    checked={};customItems={};registros={she:[],he:[]};
+    setSyncBadge('error');
+  }
 }
 async function saveChecked(){
   setSyncBadge('saving');
