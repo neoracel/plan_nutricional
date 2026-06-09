@@ -214,6 +214,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <div id="view-menu" class="view active">
   <div id="profileCard"></div>
   <div id="shakeBanner"></div>
+  <div id="iaBanner"></div>
   <div class="day-selector" id="daySel"></div>
   <div id="mealsContainer"></div>
 </div>
@@ -438,6 +439,9 @@ let registros = { she:[], he:[] };
 let analyzeProfile = 'she';
 let imageBase64 = null;
 let imageMimeType = null;
+let menuIsCustom = false;
+const MENU_ORIGINAL = JSON.parse(JSON.stringify(MENU_BASE));
+const MEAL_STYLE={'Desayuno':{icon:'☀️',bg:'#FEF9E7'},'Media mañana':{icon:'🍎',bg:'#EAF4EE'},'Comida':{icon:'🍽️',bg:'#EFF6FF'},'Merienda':{icon:'🍎',bg:'#EAF4EE'},'Cena':{icon:'🌙',bg:'#F5F3FF'}};
 
 // ─── STORAGE ─────────────────────────────────────────────
 function setSyncBadge(s){
@@ -511,8 +515,20 @@ function switchView(v,btn){
   if(v==='prog') renderProg();
   if(v==='gen'){ renderInventoryBanner(); updateAnalyzeBadge(); }
 }
+function renderIABanner(){
+  const el=document.getElementById('iaBanner');if(!el)return;
+  if(!menuIsCustom){el.innerHTML='';return;}
+  const col=profile==='she'?'var(--green)':'var(--teal)';
+  const bg=profile==='she'?'var(--green-bg)':'var(--teal-bg)';
+  const bd=profile==='she'?'var(--green-bd)':'var(--teal-bd)';
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;background:${bg};border:1px solid ${bd};border-radius:10px;padding:8px 12px;margin-bottom:10px"><span style="font-size:12px;font-weight:600;color:${col}">🤖 Menú generado por IA</span><button onclick="restoreOriginalMenu()" class="reset-btn" style="margin:0">Restaurar original</button></div>`;
+}
+function restoreOriginalMenu(){
+  Object.keys(MENU_ORIGINAL).forEach(d=>{MENU_BASE[d]=JSON.parse(JSON.stringify(MENU_ORIGINAL[d]));});
+  menuIsCustom=false;currentDay='Lunes';renderAll();
+}
 function renderAll(){
-  renderProfileCard(); renderShakeBanner(); renderDays(); renderMeals();
+  renderProfileCard(); renderShakeBanner(); renderIABanner(); renderDays(); renderMeals();
   renderProg(); renderInventoryBanner(); renderForm(); updateAnalyzeBadge();
 }
 
@@ -762,64 +778,44 @@ async function generateMenu(tipo){
   const tipoDesc=tipo==='medio'
     ?'Recetas simples y rápidas (máx 25 min), pocos ingredientes, comida casera cotidiana mexicana.'
     :'Recetas elaboradas con técnicas variadas (marinados, horneados, salteados), múltiples ingredientes, cocina mexicana saludable y gourmet.';
-  const prompt=`Eres nutriólogo. Genera menú de 5 días (LUNES a VIERNES) para DOS personas con porciones distintas.
+  const prompt=`Eres nutriólogo. Genera menú de 5 días para DOS personas. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después, sin markdown ni backticks.
 
 TIPO: ${tipoLabel} — ${tipoDesc}
 
-👩 ELLA (108kg, IMC 38.3, 50% grasa, meta bajar grasa) — toma shake diario (whey+leche+plátano = 1 fruta + 1 lácteo), NO agrega fruta ni lácteo al desayuno.
-Porciones:
-Desayuno: 3 AOA, 2 verdura, 2 cereal, 1 grasa
-Media mañana: 2 fruta, 1 grasa c/proteína
-Comida: 3 AOA, 3 cereal, 2 verdura, 2 grasa
-Merienda: 2 fruta, 1 grasa c/proteína
-Cena: 3 AOA, 2 cereal, 2 verdura, 1 grasa
+Ella: 108kg, IMC 38.3, 50% grasa, meta bajar grasa. Shake diario (whey+leche+plátano = 1 fruta + 1 lácteo). NO fruta ni lácteo extra en desayuno.
+Porciones ella — Desayuno: 3AOA+2verdura+2cereal+1grasa | Media mañana: 2fruta+1grasa | Comida: 3AOA+3cereal+2verdura+2grasa | Merienda: 2fruta+1grasa | Cena: 3AOA+2cereal+2verdura+1grasa
 
-👨 ÉL (85.1kg, IMC 28.8, 48.6% músculo, meta mantener músculo + bajar grasa) — también toma shake diario, desayuno SIN fruta/lácteo extra.
-Porciones:
-Desayuno: 3 AOA, 2 verdura, 1 cereal, 1 grasa
-Media mañana: 1 fruta, 1 grasa c/proteína
-Comida: 4 AOA, 2 cereal, 2 verdura, 1 grasa
-Merienda: 1 fruta, 1 grasa c/proteína
-Cena: 3 AOA, 1 cereal, 2 verdura, 1 grasa
+Él: 85.1kg, IMC 28.8, 48.6% músculo, meta mantener músculo+bajar grasa. Shake diario. SIN fruta/lácteo extra en desayuno.
+Porciones él — Desayuno: 3AOA+2verdura+1cereal+1grasa | Media mañana: 1fruta+1grasa | Comida: 4AOA+2cereal+2verdura+1grasa | Merienda: 1fruta+1grasa | Cena: 3AOA+1cereal+2verdura+1grasa
 
-INVENTARIO (prioriza lo disponible):
-Tienen: ${have.join(', ')||'ninguno'}
-Falta: ${missing.join(', ')||'ninguno'}
+Inventario — Tienen: ${have.join(', ')||'ninguno'} | Falta: ${missing.join(', ')||'ninguno'}
 
-FORMATO (sin markdown, sin asteriscos):
-DÍA 1 - LUNES
-Desayuno: [nombre]
-  Preparación: [instrucción breve]
-  Ella: [ingredientes con gramos]
-  Él: [ingredientes con gramos]
-
-Media mañana: [nombre]
-  Ella: [ingredientes]
-  Él: [ingredientes]
-
-Comida: [nombre]
-  Preparación: [instrucción breve]
-  Ella: [ingredientes con gramos]
-  Él: [ingredientes con gramos]
-
-Merienda: [nombre]
-  Ella: [ingredientes]
-  Él: [ingredientes]
-
-Cena: [nombre]
-  Preparación: [instrucción breve]
-  Ella: [ingredientes con gramos]
-  Él: [ingredientes con gramos]
-
-(repetir DÍA 2 a DÍA 5)`;
+JSON requerido (5 días x 5 tiempos, todos los campos obligatorios):
+{"Lunes":[{"time":"Desayuno","name":"Nombre","she":"ingredientes ella con gramos","he":"ingredientes él con gramos","tags_she":["3 AOA","2 verdura","2 cereal","1 grasa"],"tags_he":["3 AOA","2 verdura","1 cereal","1 grasa"]},{"time":"Media mañana","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Comida","name":"...","she":"...","he":"...","tags_she":["3 AOA","3 cereal","2 verdura","2 grasa"],"tags_he":["4 AOA","2 cereal","2 verdura","1 grasa"]},{"time":"Merienda","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Cena","name":"...","she":"...","he":"...","tags_she":["3 AOA","2 cereal","2 verdura","1 grasa"],"tags_he":["3 AOA","1 cereal","2 verdura","1 grasa"]}],"Martes":[...],"Miércoles":[...],"Jueves":[...],"Viernes":[...]}`;
   try{
-    const text=await callClaude([{role:'user',content:prompt}],1800);
-    const bg=tipo==='medio'?'var(--green-bg)':'var(--teal-bg)';
-    const bd=tipo==='medio'?'var(--green-bd)':'var(--teal-bd)';
-    const col=tipo==='medio'?'var(--green)':'var(--teal)';
-    res.innerHTML=`<div class="ai-result" style="background:${bg};border-color:${bd}"><pre style="color:${col}">${text}</pre></div><button class="btn-clear" onclick="document.getElementById('genResult').innerHTML=''">Limpiar</button>`;
+    const text=await callClaude([{role:'user',content:prompt}],2500);
+    const clean=text.replace(/```json|```/g,'').trim();
+    const newMenu=JSON.parse(clean);
+    const days=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+    for(const d of days){
+      if(!newMenu[d]||newMenu[d].length<5)throw new Error('Estructura incompleta: '+d);
+      newMenu[d].forEach(m=>{
+        const s=MEAL_STYLE[m.time]||{icon:'🍴',bg:'#F5F5F5'};
+        m.icon=s.icon;m.bg=s.bg;
+        if(!m.tags_she)m.tags_she=[];
+        if(!m.tags_he)m.tags_he=[];
+      });
+      MENU_BASE[d]=newMenu[d];
+    }
+    menuIsCustom=true;currentDay='Lunes';
+    document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('#mainNav .nav-btn').forEach(el=>el.classList.remove('active-she','active-he'));
+    document.getElementById('view-menu').classList.add('active');
+    document.querySelector('#mainNav .nav-btn').classList.add('active-'+profile);
+    renderAll();
   }catch(e){
     res.innerHTML=`<div class="ai-result" style="background:var(--red-bg);border-color:#FCA5A5"><pre style="color:var(--red)">Error: ${e.message}</pre></div>`;
+    btn.disabled=false;
   }
   btn.disabled=false;
 }
