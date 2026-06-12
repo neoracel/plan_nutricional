@@ -250,7 +250,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
   <!-- 1. GENERAR MENÚ -->
   <div class="gen-panel">
     <div class="ptitle">🗓 Menú semanal para los dos</div>
-    <p>Genera 5 días de recetas con porciones específicas para cada perfil, usando tu inventario.</p>
+    <p>Genera 7 días de recetas con porciones específicas para cada perfil, usando tu inventario.</p>
     <div class="btn-row" style="margin-bottom:0">
       <button class="btn-half btn-half-green" id="btnGenMedio" onclick="generateMenu('medio')">🥗 Menú Medio</button>
       <button class="btn-half btn-half-teal" id="btnGenComplejo" onclick="generateMenu('complejo')">👨‍🍳 Menú Complejo</button>
@@ -409,6 +409,46 @@ const MENU_BASE = {
      she:'pechuga desmenuzada (80g) · calabacita (60g) · zanahoria (50g) · chayote (70g) · tortillas maíz 2 pzas (60g)',
      he:'pechuga desmenuzada (100g) · calabacita (60g) · zanahoria (50g) · chayote (70g) · tortilla maíz 1 pza (30g)',
      tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ],
+  Sábado:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Molletes integrales con frijol',
+     she:'pan integral 2 reb (60g) · frijoles refritos (80g) · queso panela (40g) · jitomate (60g) · cebolla (30g) · cilantro',
+     he:'pan integral 1 reb (30g) · frijoles refritos (80g) · queso panela (40g) · jitomate (60g) · cebolla (30g) · cilantro',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Manzana y crema de cacahuate',
+     she:'manzana (150g) · crema de cacahuate (16g)',he:'manzana (75g) · crema de cacahuate (16g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🍽️',bg:'#EFF6FF',name:'Salmón al horno con camote y ensalada',
+     she:'salmón (120g) · camote cocido (70g) · espárragos (80g) · lechuga (60g) · jitomate (60g) · aceite oliva (5g)',
+     he:'salmón (160g) · camote cocido (47g) · espárragos (80g) · lechuga (60g) · jitomate (60g) · aceite oliva (5g)',
+     tags_she:['3 AOA','3 cereal','2 verdura','2 grasa'],tags_he:['4 AOA','2 cereal','2 verdura','1 grasa']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Piña y almendras',
+     she:'piña fresca (150g) · almendras (20g)',he:'piña fresca (75g) · almendras (20g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Tostadas horneadas de pollo',
+     she:'pechuga desmenuzada (120g) · tostadas horneadas 2 pzas (30g) · lechuga (60g) · jitomate (80g) · aguacate (40g)',
+     he:'pechuga desmenuzada (120g) · tostada horneada 1 pza (15g) · lechuga (60g) · jitomate (80g) · aguacate (20g)',
+     tags_she:['3 AOA','2 cereal','2 verdura','1 grasa'],tags_he:['3 AOA','1 cereal','2 verdura','1 grasa']}
+  ],
+  Domingo:[
+    {time:'Desayuno',icon:'☀️',bg:'#FEF9E7',name:'Omelette de verduras con panela',
+     she:'2 huevos (100g) · queso panela (40g) · espinaca (50g) · champiñones (60g) · pan integral 2 reb (60g) · aceite spray',
+     he:'2 huevos + 1 clara (130g) · queso panela (40g) · espinaca (50g) · champiñones (60g) · pan integral 1 reb (30g) · aceite spray',
+     tags_she:['3 AOA','2 verdura','2 cereal','1 grasa'],tags_he:['3 AOA','2 verdura','1 cereal','1 grasa']},
+    {time:'Media mañana',icon:'🍎',bg:'#EAF4EE',name:'Melón y nuez de castilla',
+     she:'melón (200g) · nuez de castilla (15g)',he:'melón (100g) · nuez de castilla (15g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Comida',icon:'🎉',bg:'#FEF3F2',name:'Comida libre — Cheat meal',
+     she:'Día de descanso 🎉 Come lo que se te antoje con moderación. Disfruta sin culpa y vuelve al plan en la cena.',
+     he:'Día de descanso 🎉 Come lo que se te antoje con moderación. Disfruta sin culpa y vuelve al plan en la cena.',
+     tags_she:['🎉 Cheat meal'],tags_he:['🎉 Cheat meal']},
+    {time:'Merienda',icon:'🍎',bg:'#EAF4EE',name:'Fresas y crema de almendras',
+     she:'fresas (150g) · crema de almendras (16g)',he:'fresas (75g) · crema de almendras (16g)',
+     tags_she:['2 fruta','1 grasa c/prot'],tags_he:['1 fruta','1 grasa c/prot']},
+    {time:'Cena',icon:'🌙',bg:'#F5F3FF',name:'Ensalada ligera de atún',
+     she:'atún en agua escurrido (120g) · lechuga (80g) · pepino (80g) · jitomate (80g) · aguacate (40g)',
+     he:'atún en agua escurrido (120g) · lechuga (80g) · pepino (80g) · jitomate (80g) · aguacate (20g)',
+     tags_she:['3 AOA','3 verdura','1 grasa'],tags_he:['3 AOA','3 verdura','1 grasa']}
   ]
 };
 
@@ -787,7 +827,7 @@ async function generateMenu(tipo){
   const tipoDesc=tipo==='medio'
     ?'Recetas simples y rápidas (máx 25 min), pocos ingredientes, comida casera cotidiana mexicana.'
     :'Recetas elaboradas con técnicas variadas (marinados, horneados, salteados), múltiples ingredientes, cocina mexicana saludable y gourmet.';
-  const prompt=`Eres nutriólogo. Genera menú de 5 días para DOS personas. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después, sin markdown ni backticks.
+  const prompt=`Eres nutriólogo. Genera menú de 7 días (Lunes a Domingo) para DOS personas. Responde ÚNICAMENTE con JSON válido, sin texto antes ni después, sin markdown ni backticks.
 
 TIPO: ${tipoLabel} — ${tipoDesc}
 
@@ -797,27 +837,30 @@ Porciones ella — Desayuno: 3AOA+2verdura+2cereal+1grasa | Media mañana: 2frut
 Él: 85.1kg, IMC 28.8, 48.6% músculo, meta mantener músculo+bajar grasa. Shake diario. SIN fruta/lácteo extra en desayuno.
 Porciones él — Desayuno: 3AOA+2verdura+1cereal+1grasa | Media mañana: 1fruta+1grasa | Comida: 4AOA+2cereal+2verdura+1grasa | Merienda: 1fruta+1grasa | Cena: 3AOA+1cereal+2verdura+1grasa
 
+IMPORTANTE — DOMINGO: la "Comida" del domingo es CHEAT MEAL (comida libre). Para ese único tiempo usa name:"Comida libre — Cheat meal", en "she" y "he" pon un mensaje motivador para comer libre con moderación (NO ingredientes), y tags_she y tags_he deben ser exactamente ["🎉 Cheat meal"]. Los demás tiempos del domingo son normales y la cena debe ser ligera.
+
 Inventario — Tienen: ${have.join(', ')||'ninguno'} | Falta: ${missing.join(', ')||'ninguno'}
 
-JSON requerido (5 días x 5 tiempos, todos los campos obligatorios):
-{"Lunes":[{"time":"Desayuno","name":"Nombre","she":"ingredientes ella con gramos","he":"ingredientes él con gramos","tags_she":["3 AOA","2 verdura","2 cereal","1 grasa"],"tags_he":["3 AOA","2 verdura","1 cereal","1 grasa"]},{"time":"Media mañana","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Comida","name":"...","she":"...","he":"...","tags_she":["3 AOA","3 cereal","2 verdura","2 grasa"],"tags_he":["4 AOA","2 cereal","2 verdura","1 grasa"]},{"time":"Merienda","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Cena","name":"...","she":"...","he":"...","tags_she":["3 AOA","2 cereal","2 verdura","1 grasa"],"tags_he":["3 AOA","1 cereal","2 verdura","1 grasa"]}],"Martes":[...],"Miércoles":[...],"Jueves":[...],"Viernes":[...]}`;
+JSON requerido (7 días x 5 tiempos, todos los campos obligatorios):
+{"Lunes":[{"time":"Desayuno","name":"Nombre","she":"ingredientes ella con gramos","he":"ingredientes él con gramos","tags_she":["3 AOA","2 verdura","2 cereal","1 grasa"],"tags_he":["3 AOA","2 verdura","1 cereal","1 grasa"]},{"time":"Media mañana","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Comida","name":"...","she":"...","he":"...","tags_she":["3 AOA","3 cereal","2 verdura","2 grasa"],"tags_he":["4 AOA","2 cereal","2 verdura","1 grasa"]},{"time":"Merienda","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Cena","name":"...","she":"...","he":"...","tags_she":["3 AOA","2 cereal","2 verdura","1 grasa"],"tags_he":["3 AOA","1 cereal","2 verdura","1 grasa"]}],"Martes":[...],"Miércoles":[...],"Jueves":[...],"Viernes":[...],"Sábado":[...],"Domingo":[...con Comida cheat meal...]}`;
   try{
-    const text=await callClaude([{role:'user',content:prompt}],8000);
+    const text=await callClaude([{role:'user',content:prompt}],12000);
     const clean=text.replace(/```json|```/g,'').trim();
     const newMenu=JSON.parse(clean);
-    const days=['Lunes','Martes','Miércoles','Jueves','Viernes'];
+    const days=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
     for(const d of days){
       if(!newMenu[d]||newMenu[d].length<5)throw new Error('Estructura incompleta: '+d);
       newMenu[d].forEach(m=>{
         const s=MEAL_STYLE[m.time]||{icon:'🍴',bg:'#F5F5F5'};
         m.icon=s.icon;m.bg=s.bg;
+        if(Array.isArray(m.tags_she)&&m.tags_she.some(t=>/cheat/i.test(t))){m.icon='🎉';m.bg='#FEF3F2';}
         if(!m.tags_she)m.tags_she=[];
         if(!m.tags_he)m.tags_he=[];
       });
       MENU_BASE[d]=newMenu[d];
     }
     menuIsCustom=true;currentDay='Lunes';
-    const toSave={};['Lunes','Martes','Miércoles','Jueves','Viernes'].forEach(d=>{toSave[d]=MENU_BASE[d];});
+    const toSave={};['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].forEach(d=>{toSave[d]=MENU_BASE[d];});
     apiSet('customMenu',JSON.stringify(toSave)).catch(()=>{});
     document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
     document.querySelectorAll('#mainNav .nav-btn').forEach(el=>el.classList.remove('active-she','active-he'));
