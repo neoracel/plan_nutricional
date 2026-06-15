@@ -827,14 +827,14 @@ async function deleteRegistro(idx){
 
 // ─── IA ──────────────────────────────────────────────────
 function getInventory(){
-  const have=[],missing=[];
+  const have=[],missing=[],customAll=[];
   Object.entries(SUPER_BASE).forEach(([cat,items])=>{
     items.forEach(([name],i)=>{ const key=cat+'_'+i; if(checked[key])have.push(name);else missing.push(name); });
   });
   Object.entries(customItems).forEach(([cat,items])=>{
-    items.forEach(ci=>{ const key='custom_'+cat+'_'+ci.id; if(checked[key])have.push(ci.name);else missing.push(ci.name); });
+    items.forEach(ci=>{ const key='custom_'+cat+'_'+ci.id; if(checked[key])have.push(ci.name);else missing.push(ci.name); customAll.push(ci.name); });
   });
-  return {have,missing};
+  return {have,missing,customAll};
 }
 
 function renderInventoryBanner(){
@@ -870,7 +870,7 @@ async function generateMenu(tipo){
   const dotColor=tipo==='medio'?'var(--green)':'var(--teal)';
   const tipoLabel=tipo==='medio'?'🥗 Menú Medio':'👨‍🍳 Menú Complejo';
   res.innerHTML=`<div class="loading"><div class="loading-dots"><div class="dot" style="background:${dotColor}"></div><div class="dot" style="background:${dotColor}"></div><div class="dot" style="background:${dotColor}"></div></div><p>Generando ${tipoLabel}…</p></div>`;
-  const {have,missing}=getInventory();
+  const {have,customAll}=getInventory();
   const tipoDesc=tipo==='medio'
     ?'Recetas simples y rápidas (máx 25 min), pocos ingredientes, comida casera cotidiana mexicana.'
     :'Recetas elaboradas con técnicas variadas (marinados, horneados, salteados), múltiples ingredientes, cocina mexicana saludable y gourmet.';
@@ -886,7 +886,8 @@ Porciones él — Desayuno: 3AOA+2verdura+1cereal+1grasa | Media mañana: 1fruta
 
 IMPORTANTE — DOMINGO: la "Comida" del domingo es CHEAT MEAL (comida libre). Para ese único tiempo usa name:"Comida libre — Cheat meal", en "she" y "he" pon un mensaje motivador para comer libre con moderación (NO ingredientes), y tags_she y tags_he deben ser exactamente ["🎉 Cheat meal"]. Los demás tiempos del domingo son normales y la cena debe ser ligera.
 
-Inventario — Tienen: ${have.join(', ')||'ninguno'} | Falta: ${missing.join(', ')||'ninguno'}
+INGREDIENTES DISPONIBLES (arma TODOS los platillos usando ÚNICAMENTE estos, más básicos de cocina que se dan por hechos: sal, pimienta, aceite, especias, ajo, cebolla, agua): ${have.join(', ')||'ninguno'}
+${customAll.length?`OBLIGATORIOS (el usuario los agregó a mano; DEBES incluir cada uno en al menos un platillo de la semana): ${customAll.join(', ')}\n`:''}REGLA ESTRICTA: No uses ningún ingrediente que no esté en las listas de arriba (salvo los básicos de cocina). No agregues ingredientes caros, fuera de temporada o difíciles de conseguir. Si "DISPONIBLES" dice "ninguno", usa ingredientes económicos y comunes en México.
 
 JSON requerido (7 días x 5 tiempos, todos los campos obligatorios):
 {"Lunes":[{"time":"Desayuno","name":"Nombre","she":"ingredientes ella con gramos","he":"ingredientes él con gramos","tags_she":["3 AOA","2 verdura","2 cereal","1 grasa"],"tags_he":["3 AOA","2 verdura","1 cereal","1 grasa"]},{"time":"Media mañana","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Comida","name":"...","she":"...","he":"...","tags_she":["3 AOA","3 cereal","2 verdura","2 grasa"],"tags_he":["4 AOA","2 cereal","2 verdura","1 grasa"]},{"time":"Merienda","name":"...","she":"...","he":"...","tags_she":["2 fruta","1 grasa c/prot"],"tags_he":["1 fruta","1 grasa c/prot"]},{"time":"Cena","name":"...","she":"...","he":"...","tags_she":["3 AOA","2 cereal","2 verdura","1 grasa"],"tags_he":["3 AOA","1 cereal","2 verdura","1 grasa"]}],"Martes":[...],"Miércoles":[...],"Jueves":[...],"Viernes":[...],"Sábado":[...],"Domingo":[...con Comida cheat meal...]}`;
